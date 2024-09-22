@@ -11,6 +11,7 @@ interface ImageDetails {
 interface ImageData {
   url: string;
   height: number;
+  isGif: boolean;
 }
 
 export const Images: React.FC = () => {
@@ -25,7 +26,7 @@ export const Images: React.FC = () => {
 
       chrome.storage.local.get(tabId.toString(), (items) => {
         const requests = (items[tabId.toString()] as ImageDetails[]) || [];
-        const imgs = requests.filter(({ type }) => type === "image");
+        const imgs = requests.filter(({ type }) => type === "image" || type === "media");
 
         const uniqueImages = [
           ...new Map(imgs.map((item) => [item.url, item])).values(),
@@ -34,8 +35,12 @@ export const Images: React.FC = () => {
         const imagePromises = uniqueImages.map(({ url }) => {
           return new Promise<ImageData>((resolve) => {
             const img = new Image();
-            img.onload = () => resolve({ url: img.src, height: img.height });
-            img.onerror = () => resolve({ url, height: 0 }); // Handle load errors
+            img.onload = () => resolve({ 
+              url: img.src, 
+              height: img.height, 
+              isGif: url.toLowerCase().endsWith('.gif') 
+            });
+            img.onerror = () => resolve({ url, height: 0, isGif: false });
             img.src = url;
           });
         });

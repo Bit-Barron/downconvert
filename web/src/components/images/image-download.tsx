@@ -65,7 +65,7 @@ export const ImageDownload: React.FC = () => {
             <SelectContent>
               <SelectItem value="original">Original</SelectItem>
               {IMAGE_FORMATS.map((fmt) => (
-                <SelectItem key={fmt} value={fmt}>
+                <SelectItem defaultValue={fmt[0]} key={fmt} value={fmt}>
                   {fmt.toUpperCase()}
                 </SelectItem>
               ))}

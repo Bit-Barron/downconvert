@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { a, useTransition } from "@react-spring/web";
 import shuffle from "lodash.shuffle";
 import React, { useEffect, useMemo } from "react";
@@ -55,7 +56,7 @@ export const ImageMasonry: React.FC = () => {
       className={styles.list}
       style={{ height: Math.max(...heights) }}
     >
-      {transitions((style, item) => (
+      {transitions((style, item: any) => (
         <a.div style={style}>
           <div
             onClick={() => setSelectedImage(item)}
@@ -63,9 +64,15 @@ export const ImageMasonry: React.FC = () => {
               backgroundImage: `url(${item.url})`,
               borderWidth: selectedImages.includes(item) ? "4px" : "0px",
               borderStyle: "solid",
-              borderColor: "rgb(30, 64, 175)", // blue-800 in tailwind
+              borderColor: "rgb(30, 64, 175)",
             }}
-          />
+          >
+            {item.isGif && (
+              <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs">
+                GIF
+              </div>
+            )}
+          </div>
         </a.div>
       ))}
     </div>
