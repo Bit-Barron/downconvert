@@ -3,7 +3,6 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 
 COPY package.json ./
-COPY prisma ./prisma
 RUN yarn
 RUN yarn add sharp --ignore-engines
 
@@ -15,7 +14,6 @@ WORKDIR /app
 
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
-RUN npx prisma generate
 
 RUN yarn build
 #############################################
