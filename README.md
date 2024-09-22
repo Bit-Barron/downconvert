@@ -1,50 +1,43 @@
-# React + TypeScript + Vite
+<h1>DownConvert Extension</h1>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h2>Übersicht</h2>
+<p>DownConvert ist eine leistungsstarke Browsererweiterung, die Ihr Web-Browsing-Erlebnis verbessert, indem Sie Bilder und Videos von verschiedenen Websites problemlos anzeigen, konvertieren und herunterladen können. Mit DownConvert können Sie den Dateityp von Multimedia-Inhalten einfach ändern und direkt auf Ihrem Gerät speichern.</p>
 
-Currently, two official plugins are available:
+<h2>Funktionen</h2>
+<ul>
+    <li><strong>Bilder und Videos anzeigen</strong>: Greifen Sie auf Multimedia-Inhalte von verschiedenen Websites zu und sehen Sie sie direkt in Ihrem Browser an.</li>
+    <li><strong>Dateityp ändern</strong>: Konvertieren Sie Bilder und Videos in verschiedene Dateiformate.</li>
+    <li><strong>Herunterladen</strong>: Laden Sie die konvertierten oder originalen Multimedia-Dateien direkt auf Ihr Gerät herunter.</li>
+</ul>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<h2>Installation</h2>
+<p>Um DownConvert zu installieren, folgen Sie diesen einfachen Schritten:</p>
+<ol>
+    <li>Öffnen Sie den Chrome Web Store oder den Add-ons-Bereich Ihres Browsers.</li>
+    <li>Suchen Sie nach "DownConvert Extension".</li>
+    <li>Klicken Sie auf "Hinzufügen" oder "Installieren", um die Erweiterung zu Ihrem Browser hinzuzufügen.</li>
+</ol>
 
-## Expanding the ESLint configuration
+<h2>Verwendung</h2>
+<p>Nach der Installation der DownConvert-Erweiterung können Sie die folgenden Schritte ausführen, um Bilder und Videos zu konvertieren und herunterzuladen:</p>
+<ol>
+    <li>Besuchen Sie eine Website, die Bilder oder Videos enthält.</li>
+    <li>Klicken Sie auf das DownConvert-Symbol in der Symbolleiste Ihres Browsers.</li>
+    <li>Wählen Sie das Bild oder Video aus, das Sie konvertieren oder herunterladen möchten.</li>
+    <li>Wählen Sie das gewünschte Dateiformat aus der Liste der verfügbaren Optionen.</li>
+    <li>Klicken Sie auf "Konvertieren" oder "Herunterladen", um den Vorgang abzuschließen.</li>
+</ol>
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+<h2>Unterstützte Formate</h2>
+<p>DownConvert unterstützt eine Vielzahl von Bild- und Videoformaten, darunter:</p>
+<ul>
+    <li><strong>Bilder:</strong> JPEG, PNG, GIF, BMP, TIFF</li>
+    <li><strong>Videos:</strong> MP4, AVI, MKV, WEBM, MOV</li>
+</ul>
 
-- Configure the top-level `parserOptions` property like this:
+<h2>Kontakt und Unterstützung</h2>
+<p>Wenn Sie Fragen oder Unterstützung benötigen, kontaktieren Sie uns bitte über die folgende E-Mail-Adresse: <a href="mailto:support@downconvert.com">support@downconvert.com</a>.</p>
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+<footer>
+    &copy; 2024 DownConvert. Alle Rechte vorbehalten.
+</footer>
