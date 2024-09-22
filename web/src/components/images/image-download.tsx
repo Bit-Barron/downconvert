@@ -12,8 +12,6 @@ import {
   SelectValue,
 } from "../ui/select";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export const ImageDownload: React.FC = () => {
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
   const { format, setFormat, selectedImages } = ImageStore();
@@ -21,7 +19,7 @@ export const ImageDownload: React.FC = () => {
   const sendImages = async (images: Image[]): Promise<void> => {
     try {
       const response = await axios.post(
-        `${API_URL}/api/imgs`,
+        `https://downconvert-server.barron.agency/api/imgs`,
         {
           images,
           format,
