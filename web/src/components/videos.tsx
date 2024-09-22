@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { getUrlResolver } from "../resolver/videoUrlResolver";
 import { VideoStore } from "../store/VideoStore";
 
@@ -13,14 +13,21 @@ export const Videos: React.FC = () => {
       for (const item of requests) {
         const resolver = getUrlResolver(item.url);
         if (!resolver) continue;
-        const vid = document.createElement("video");
-        vid.onload = () =>
-          upsertVideo({
-            url: vid.src,
-            height: vid.height,
-          });
-
-        vid.src = await resolver.resolveVideoUrl(item.url);
+        try {
+          const resolvedUrl = await resolver.resolveVideoUrl(item.url);
+          if (resolvedUrl) {
+            const vid = document.createElement("video");
+            vid.onloadedmetadata = () => {
+              upsertVideo({
+                url: resolvedUrl,
+                height: vid.videoHeight,
+              });
+            };
+            vid.src = resolvedUrl;
+          }
+        } catch (error) {
+          console.error("Error resolving video URL:", error);
+        }
       }
     });
   }, []);
@@ -30,8 +37,8 @@ export const Videos: React.FC = () => {
       <div className="mt-10">
         {url ? (
           <div>
-            <video controls onClick={() => setUrl(url)}>
-              <source src={url} />
+            <video controls src={url} onClick={() => setUrl(url)}>
+              Your browser does not support the video tag.
             </video>
           </div>
         ) : (

@@ -1,6 +1,6 @@
 import { a, useTransition } from "@react-spring/web";
 import shuffle from "lodash.shuffle";
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import useMeasure from "react-use-measure";
 import { ImageStore } from "../../store/ImageStore";
 import useMedia from "../../store/MediaStore";
@@ -40,7 +40,7 @@ export const ImageMasonry: React.FC = () => {
   }, [columns, images, width]);
 
   const transitions = useTransition(gridItems, {
-    key: (item: { css: string; height: number }) => item.css,
+    key: (item: { css: string; height: number; id: string }) => item.id,
     from: ({ x, y, width, height }) => ({ x, y, width, height, opacity: 0 }),
     enter: ({ x, y, width, height }) => ({ x, y, width, height, opacity: 1 }),
     update: ({ x, y, width, height }) => ({ x, y, width, height }),
@@ -48,29 +48,26 @@ export const ImageMasonry: React.FC = () => {
     config: { mass: 5, tension: 500, friction: 100 },
     trail: 25,
   });
+
   return (
     <div
       ref={ref}
       className={styles.list}
       style={{ height: Math.max(...heights) }}
     >
-      {transitions((style, item) => {
-        console.log("test", item);
-        return (
-          <a.div style={style}>
-            <div
-              onClick={() => setSelectedImage(item)}
-              style={{
-                backgroundImage: `url(${item.url})`,
-              }}
-              className={`${
-                selectedImages.includes(item) &&
-                "border-4 border-b border-blue-800"
-              }`}
-            />
-          </a.div>
-        );
-      })}
+      {transitions((style, item) => (
+        <a.div style={style}>
+          <div
+            onClick={() => setSelectedImage(item)}
+            style={{
+              backgroundImage: `url(${item.url})`,
+              borderWidth: selectedImages.includes(item) ? "4px" : "0px",
+              borderStyle: "solid",
+              borderColor: "rgb(30, 64, 175)", // blue-800 in tailwind
+            }}
+          />
+        </a.div>
+      ))}
     </div>
   );
 };

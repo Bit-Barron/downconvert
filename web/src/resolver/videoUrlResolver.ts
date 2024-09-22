@@ -2,7 +2,6 @@ import { VideoStore } from "@/store/VideoStore";
 import axios from "axios";
 
 export function getUrlResolver(url: string): VideoUrlResolver | undefined {
-  console.log(url);
   if (
     url.startsWith("https://www.facebook.com/watch/?v=") ||
     url.startsWith("https://www.facebook.com/watch?v=")
@@ -25,6 +24,35 @@ export interface VideoUrlResolver {
   resolveVideoUrl(originurl: string): Promise<string>;
 }
 
+export class RedditUrlResolver implements VideoUrlResolver {
+  async resolveVideoUrl(originurl: string): Promise<string> {
+    console.log(originurl);
+    const { setUrl } = VideoStore.getState();
+    const headers = {
+      accept: "application/json",
+    };
+    const client = axios.create({ headers });
+
+    try {
+      const jsonUrl = `${originurl}.json`;
+      const response = await client.get(jsonUrl);
+      const data = response.data;
+
+      const videoUrl =
+        data[0]?.data?.children[0]?.data?.secure_media?.reddit_video
+          ?.fallback_url;
+
+      if (videoUrl) {
+        setUrl(videoUrl);
+        return videoUrl;
+      }
+    } catch (error) {
+      console.error("Error resolving Reddit video URL:", error);
+    }
+
+    return "";
+  }
+}
 export class FacebookUrlResolver implements VideoUrlResolver {
   async resolveVideoUrl(originurl: string): Promise<string> {
     const { setUrl } = VideoStore.getState();
@@ -62,7 +90,6 @@ export class TikTokUrlResolver implements VideoUrlResolver {
     const response = await client.get(originurl);
     const data = response.data;
 
-    // Parse HTML and find the video tag with the src attribute
     const parser = new DOMParser();
     const doc = parser.parseFromString(data, "text/html");
 

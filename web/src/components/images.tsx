@@ -14,7 +14,7 @@ interface ImageData {
 }
 
 export const Images: React.FC = () => {
-  const { upsertImage, setAllImages, clearImages, setCurrentTabId } =
+  const { upsertImage, setAllImages, clearImages, setCurrentTabId, images } =
     ImageStore();
   const [loading, setLoading] = useState(true);
 
@@ -89,7 +89,13 @@ export const Images: React.FC = () => {
   return (
     <div className="relative min-h-screen pb-16">
       <Toaster richColors position="top-center" />
-      <ImageMasonry />
+      {images.length === 0 ? (
+        <div className="text-xl font-bold">No images found</div>
+      ) : (
+        <div>
+          <ImageMasonry />
+        </div>
+      )}
     </div>
   );
 };

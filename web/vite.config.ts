@@ -3,7 +3,7 @@ import { crx } from "@crxjs/vite-plugin";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
-import manifest from "./extensions/manifest.json";
+import manifest from "./extension/manifest.json";
 
 export default defineConfig({
   //@ts-expect-error
