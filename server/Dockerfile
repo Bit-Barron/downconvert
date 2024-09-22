@@ -1,23 +1,37 @@
-# Use an official Node runtime as the base image
-FROM node:18-alpine
-
-# Set the working directory in the container
+# Stage 0
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+COPY package.json ./
+COPY prisma ./prisma
+RUN yarn
+RUN yarn add sharp --ignore-engines
 
-# Install dependencies
-RUN npm ci
+#############################################
 
-# Copy the rest of the application code
+# Stage 1
+FROM node:20-alpine AS builder
+WORKDIR /app
+
 COPY . .
+COPY --from=deps /app/node_modules ./node_modules
+RUN npx prisma generate
 
-# Build the Next.js application
-RUN npm run build
+RUN yarn build
+#############################################
 
-# Expose the port the app runs on
-EXPOSE 3000
 
-# Start the application
-CMD ["npm", "start"]
+# Stage 2
+FROM node:20-alpine AS prod
+
+WORKDIR /app
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+
+EXPOSE 4000
+
+CMD yarn start
+#############################################

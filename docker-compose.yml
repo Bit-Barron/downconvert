@@ -1,0 +1,19 @@
+services:
+  downconvert-server:
+    build:
+      context: server/
+      dockerfile: Dockerfile
+    container_name: downconvert-server
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.downconvert-server.rule=Host(`downconvert-server.barron.agency`)"
+      - "traefik.http.routers.downconvert-server.entrypoints=websecure"
+      - "traefik.http.routers.downconvert-server.tls.certresolver=letsencrypt"
+      - "traefik.http.services.downconvert-server.loadbalancer.server.port=3000"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: false
+    name: proxy
