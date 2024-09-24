@@ -34,11 +34,21 @@ export const ImageDownload: React.FC = () => {
       console.log("Response type:", response.data.type);
 
       const contentDisposition = response.headers["content-disposition"];
-      const filename = contentDisposition
+      let filename = contentDisposition
         ? contentDisposition.split("filename=")[1].replace(/"/g, "")
-        : "images.zip";
+        : "download";
 
-      const blob = new Blob([response.data], { type: "application/zip" });
+      const blob = new Blob([response.data], { type: response.data.type });
+
+      // Handle different content types
+      if (response.data.type === "application/zip") {
+        filename = filename || "images.zip";
+      } else {
+        // For single file downloads (e.g., when format is 'original' and only one image)
+        const extension =
+          format === "original" ? images[0].url.split(".").pop() : format;
+        filename = `${filename || "image"}.${extension}`;
+      }
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
