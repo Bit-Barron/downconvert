@@ -52,20 +52,24 @@ export class AppController {
         });
         const imageBuffer = Buffer.from(response.data);
 
+        // Log the content type of the image
+        const contentType = response.headers['content-type'];
+        console.log(`Processing image: ${name}, Content-Type: ${contentType}`);
+
         if (format === 'original') {
-          const contentType = response.headers['content-type'];
           console.log(`Adding original image: ${name}, type: ${contentType}`);
           zip.file(name, imageBuffer, { binary: true });
         } else {
           let sharpInstance = sharp(imageBuffer);
           sharpInstance = sharpInstance.toFormat(format as any);
           const processedImage = await sharpInstance.toBuffer();
+          console.log(`Adding converted image: ${name}.${format}`);
           zip.file(`${name}.${format}`, processedImage, { binary: true });
         }
       }
 
       const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
-      console.log('ZIP file size:', zipBuffer.length);
+      console.log('ZIP file size:', zipBuffer.length, 'bytes');
 
       reply
         .header('Content-Type', 'application/zip')

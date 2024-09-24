@@ -86,6 +86,8 @@ export const Images: React.FC = () => {
     };
   }, [handleTabChange]);
 
+  console.log(images);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
