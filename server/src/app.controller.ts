@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -13,7 +12,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
-import sharp from 'sharp';
+import sharp, { FormatEnum } from 'sharp';
 import { AppService } from './app.service';
 
 interface Image {
@@ -22,17 +21,12 @@ interface Image {
 }
 
 interface Video {
-  // Add properties for Video interface if needed
+  // Define the structure of your Video type here
 }
 
 @Controller('api')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get('hello')
-  async getHello() {
-    return 'Hello World!';
-  }
+  constructor(private readonly appService: AppService) {}z
 
   @Post('imgs')
   async getImgUrl(
@@ -41,61 +35,62 @@ export class AppController {
   ) {
     try {
       const { images, format } = payload;
-      console.log('Received request with format:', format);
+      console.log(images, format);
 
-      if (format === 'original' && images.length === 1) {
-        // Handle single original image download
-        const image = images[0];
-        const response = await axios.get(image.url, {
-          responseType: 'arraybuffer',
-        });
-        const imageBuffer = Buffer.from(response.data);
-        const contentType = response.headers['content-type'];
-        const name = new URL(image.url).pathname.split('/').pop() || 'image';
-
-        reply
-          .header('Content-Type', contentType)
-          .header('Content-Disposition', `attachment; filename=${name}`)
-          .send(imageBuffer);
-
-        console.log('Single original image sent successfully');
-        return 'Image processed successfully';
+      if (format !== 'original' && !this.isValidFormat(format)) {
+        throw new HttpException(
+          'Invalid format specified',
+          HttpStatus.BAD_REQUEST,
+        );
       }
+
+      const imagePath = path.join(path.resolve(), 'images');
+      fs.mkdirSync(imagePath, { recursive: true });
 
       const zip = new JSZip();
 
       for (const image of images) {
-        const name = new URL(image.url).pathname.split('/').pop() || 'image';
+        const name = new URL(image.url).pathname.split('/').slice(-1)[0];
+        const imageType = image.headers
+          ?.find((header) => header.name.toLowerCase() === 'content-type')
+          ?.value.replace('image/', '');
+
         const response = await axios.get(image.url, {
           responseType: 'arraybuffer',
         });
-        const imageBuffer = Buffer.from(response.data);
-
-        const contentType = response.headers['content-type'];
-        console.log(`Processing image: ${name}, Content-Type: ${contentType}`);
+        const imageBuffer = Buffer.from(response.data, 'binary');
 
         if (format === 'original') {
-          console.log(`Adding original image: ${name}, type: ${contentType}`);
-          zip.file(name, imageBuffer, { binary: true });
+          // Don't convert, use original image data
+          zip.file(name, imageBuffer);
         } else {
           let sharpInstance = sharp(imageBuffer);
-          sharpInstance = sharpInstance.toFormat(format as any);
+
+          if (format === 'heif') {
+            sharpInstance = sharpInstance.heif({ quality: 80 });
+          } else {
+            sharpInstance = sharpInstance.toFormat(format as keyof FormatEnum);
+          }
+
           const processedImage = await sharpInstance.toBuffer();
-          console.log(`Adding converted image: ${name}.${format}`);
-          zip.file(`${name}.${format}`, processedImage, { binary: true });
+          zip.file(`${name}.${format}`, processedImage);
         }
       }
 
       const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
-      console.log('ZIP file size:', zipBuffer.length, 'bytes');
+
+      const zipFileName = path.join(imagePath, `images.zip`);
+      fs.writeFileSync(zipFileName, zipBuffer);
 
       reply
         .header('Content-Type', 'application/zip')
         .header('Content-Disposition', `attachment; filename=images.zip`)
         .send(zipBuffer);
 
-      console.log('Response sent successfully');
-      return 'Images processed successfully';
+      // Cleanup: Remove the zip file after sending
+      fs.unlinkSync(zipFileName);
+
+      return zipFileName;
     } catch (error) {
       console.error('Error processing images:', error);
       throw new HttpException(
@@ -103,6 +98,19 @@ export class AppController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  private isValidFormat(format: string): boolean {
+    const validFormats = [
+      'original',
+      'jpeg',
+      'png',
+      'webp',
+      'avif',
+      'heif',
+      'tiff',
+    ];
+    return validFormats.includes(format.toLowerCase());
   }
 
   @Post('videos')
