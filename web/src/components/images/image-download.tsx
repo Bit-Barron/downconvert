@@ -34,11 +34,21 @@ export const ImageDownload: React.FC = () => {
       console.log("Response type:", response.data.type);
 
       const contentDisposition = response.headers["content-disposition"];
-      const filename = contentDisposition
+      let filename = contentDisposition
         ? contentDisposition.split("filename=")[1].replace(/"/g, "")
-        : "images.zip";
+        : "download";
 
-      const blob = new Blob([response.data], { type: "application/zip" });
+      const blob = new Blob([response.data], { type: response.data.type });
+
+      // Handle different content types
+      if (response.data.type === "application/zip") {
+        filename = filename || "images.zip";
+      } else {
+        // For single file downloads (e.g., when format is 'original' and only one image)
+        const extension =
+          format === "original" ? images[0].url.split(".").pop() : format;
+        filename = `${filename || "image"}.${extension}`;
+      }
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -73,9 +83,11 @@ export const ImageDownload: React.FC = () => {
               <SelectValue placeholder="Select format" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="original">original</SelectItem>
-              {IMAGE_FORMATS.map((fmt) => (
-                <SelectItem key={fmt} value={fmt}>
+              <SelectItem key="original" value="original">
+                original
+              </SelectItem>
+              {IMAGE_FORMATS.map((fmt, index) => (
+                <SelectItem key={`${fmt}-${index}`} value={fmt}>
                   {fmt.toUpperCase()}
                 </SelectItem>
               ))}
