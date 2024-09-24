@@ -46,24 +46,18 @@ export class AppController {
         );
       }
 
-      const imagePath = path.join(path.resolve(), 'images');
-      fs.mkdirSync(imagePath, { recursive: true });
-
       const zip = new JSZip();
 
       for (const image of images) {
         const name = new URL(image.url).pathname.split('/').slice(-1)[0];
-        const imageType = image.headers
-          ?.find((header) => header.name.toLowerCase() === 'content-type')
-          ?.value.replace('image/', '');
-
         const response = await axios.get(image.url, {
           responseType: 'arraybuffer',
         });
-        const imageBuffer = Buffer.from(response.data, 'binary');
+        const imageBuffer = Buffer.from(response.data);
 
         if (format === 'original') {
-          zip.file(name, imageBuffer);
+          const contentType = response.headers['content-type'];
+          zip.file(name, imageBuffer, { binary: true });
         } else {
           let sharpInstance = sharp(imageBuffer);
 
@@ -74,23 +68,18 @@ export class AppController {
           }
 
           const processedImage = await sharpInstance.toBuffer();
-          zip.file(`${name}.${format}`, processedImage);
+          zip.file(`${name}.${format}`, processedImage, { binary: true });
         }
       }
 
       const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
-
-      const zipFileName = path.join(imagePath, `images.zip`);
-      fs.writeFileSync(zipFileName, zipBuffer);
 
       reply
         .header('Content-Type', 'application/zip')
         .header('Content-Disposition', `attachment; filename=images.zip`)
         .send(zipBuffer);
 
-      fs.unlinkSync(zipFileName);
-
-      return zipFileName;
+      return 'Images processed successfully';
     } catch (error) {
       console.error('Error processing images:', error);
       throw new HttpException(

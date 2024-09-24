@@ -25,7 +25,7 @@ export type ImageStore = {
 
 export const ImageStore = create<ImageStore>()(
   immer<ImageStore>((set, get) => ({
-    format: "orginal" as ImageFormat,
+    format: "original",
     setFormat: (format) => set((state) => ({ ...state, format })),
 
     currentTabId: null,
