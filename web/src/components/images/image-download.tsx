@@ -63,9 +63,9 @@ export const ImageDownload: React.FC = () => {
               <SelectValue placeholder="Select format" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="original">Original</SelectItem>
+              <SelectItem value="original">original</SelectItem>
               {IMAGE_FORMATS.map((fmt) => (
-                <SelectItem defaultValue={fmt[0]} key={fmt} value={fmt}>
+                <SelectItem key={fmt} value={fmt}>
                   {fmt.toUpperCase()}
                 </SelectItem>
               ))}
