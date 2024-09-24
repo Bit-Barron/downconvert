@@ -13,7 +13,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
-import sharp, { FormatEnum } from 'sharp';
+import sharp from 'sharp';
 import { AppService } from './app.service';
 
 interface Image {
@@ -41,51 +41,38 @@ export class AppController {
   ) {
     try {
       const { images, format } = payload;
-      console.log("Received request with format:", format);
-
-      if (format !== 'original' && !this.isValidFormat(format)) {
-        throw new HttpException(
-          'Invalid format specified',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      console.log('Received request with format:', format);
 
       const zip = new JSZip();
 
       for (const image of images) {
-        const name = new URL(image.url).pathname.split('/').slice(-1)[0];
+        const name = new URL(image.url).pathname.split('/').pop() || 'image';
         const response = await axios.get(image.url, {
           responseType: 'arraybuffer',
         });
         const imageBuffer = Buffer.from(response.data);
 
         if (format === 'original') {
-          const contentType = response.headers['content-type'] as string;
+          const contentType = response.headers['content-type'];
           console.log(`Adding original image: ${name}, type: ${contentType}`);
-          zip.file(name, imageBuffer, { binary: true, comment: contentType });
+          zip.file(name, imageBuffer, { binary: true });
         } else {
           let sharpInstance = sharp(imageBuffer);
-
-          if (format === 'heif') {
-            sharpInstance = sharpInstance.heif({ quality: 80 });
-          } else {
-            sharpInstance = sharpInstance.toFormat(format as keyof FormatEnum);
-          }
-
+          sharpInstance = sharpInstance.toFormat(format as any);
           const processedImage = await sharpInstance.toBuffer();
           zip.file(`${name}.${format}`, processedImage, { binary: true });
         }
       }
 
       const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
-      console.log("ZIP file size:", zipBuffer.length);
+      console.log('ZIP file size:', zipBuffer.length);
 
       reply
         .header('Content-Type', 'application/zip')
         .header('Content-Disposition', `attachment; filename=images.zip`)
         .send(zipBuffer);
 
-      console.log("Response sent successfully");
+      console.log('Response sent successfully');
       return 'Images processed successfully';
     } catch (error) {
       console.error('Error processing images:', error);
@@ -94,18 +81,6 @@ export class AppController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  private isValidFormat(format: string): boolean {
-    const validFormats = [
-      'jpeg',
-      'png',
-      'webp',
-      'avif',
-      'heif',
-      'tiff',
-    ];
-    return validFormats.includes(format.toLowerCase());
   }
 
   @Post('videos')
