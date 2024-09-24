@@ -18,6 +18,7 @@ export const ImageDownload: React.FC = () => {
 
   const sendImages = async (images: Image[]): Promise<void> => {
     try {
+      console.log("Sending request with format:", format);
       const response = await axios.post(
         `https://downconvert-server.barron.agency/api/imgs`,
         {
@@ -28,20 +29,29 @@ export const ImageDownload: React.FC = () => {
           responseType: "blob",
         }
       );
-      const contentdisposition =
-        response.headers["content-disposition"].split("=")[1];
+
+      console.log("Response headers:", response.headers);
+      console.log("Response type:", response.data.type);
+
+      const contentDisposition = response.headers["content-disposition"];
+      const filename = contentDisposition
+        ? contentDisposition.split("filename=")[1].replace(/"/g, "")
+        : "images.zip";
+
       const blob = new Blob([response.data], { type: "application/zip" });
 
-      if (downloadLinkRef.current) {
-        downloadLinkRef.current.href = URL.createObjectURL(blob);
-        downloadLinkRef.current.download = contentdisposition;
-        downloadLinkRef.current.click();
-        URL.revokeObjectURL(downloadLinkRef.current.href);
-      }
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
       toast.success("Images downloaded successfully");
     } catch (err) {
-      console.error(err);
+      console.error("Error downloading images:", err);
       toast.error("Error downloading images");
     }
   };

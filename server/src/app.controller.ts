@@ -21,6 +21,10 @@ interface Image {
   headers?: { name: string; value: string }[];
 }
 
+interface Video {
+  // Add properties for Video interface if needed
+}
+
 @Controller('api')
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -37,7 +41,7 @@ export class AppController {
   ) {
     try {
       const { images, format } = payload;
-      console.log(images, format);
+      console.log("Received request with format:", format);
 
       if (format !== 'original' && !this.isValidFormat(format)) {
         throw new HttpException(
@@ -56,8 +60,9 @@ export class AppController {
         const imageBuffer = Buffer.from(response.data);
 
         if (format === 'original') {
-          const contentType = response.headers['content-type'];
-          zip.file(name, imageBuffer, { binary: true });
+          const contentType = response.headers['content-type'] as string;
+          console.log(`Adding original image: ${name}, type: ${contentType}`);
+          zip.file(name, imageBuffer, { binary: true, comment: contentType });
         } else {
           let sharpInstance = sharp(imageBuffer);
 
@@ -73,12 +78,14 @@ export class AppController {
       }
 
       const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+      console.log("ZIP file size:", zipBuffer.length);
 
       reply
         .header('Content-Type', 'application/zip')
         .header('Content-Disposition', `attachment; filename=images.zip`)
         .send(zipBuffer);
 
+      console.log("Response sent successfully");
       return 'Images processed successfully';
     } catch (error) {
       console.error('Error processing images:', error);
@@ -91,7 +98,6 @@ export class AppController {
 
   private isValidFormat(format: string): boolean {
     const validFormats = [
-      'original',
       'jpeg',
       'png',
       'webp',
