@@ -43,25 +43,6 @@ export class AppController {
       const { images, format } = payload;
       console.log('Received request with format:', format);
 
-      if (format === 'original' && images.length === 1) {
-        // Handle single original image download
-        const image = images[0];
-        const response = await axios.get(image.url, {
-          responseType: 'arraybuffer',
-        });
-        const imageBuffer = Buffer.from(response.data);
-        const contentType = response.headers['content-type'];
-        const name = new URL(image.url).pathname.split('/').pop() || 'image';
-
-        reply
-          .header('Content-Type', contentType)
-          .header('Content-Disposition', `attachment; filename=${name}`)
-          .send(imageBuffer);
-
-        console.log('Single original image sent successfully');
-        return 'Image processed successfully';
-      }
-
       const zip = new JSZip();
 
       for (const image of images) {
@@ -71,6 +52,7 @@ export class AppController {
         });
         const imageBuffer = Buffer.from(response.data);
 
+        // Log the content type of the image
         const contentType = response.headers['content-type'];
         console.log(`Processing image: ${name}, Content-Type: ${contentType}`);
 
