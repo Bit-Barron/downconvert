@@ -34,7 +34,7 @@ export const Videos: React.FC = () => {
 
   return (
     <section>
-      <div className="mt-10">
+      <div className="">
         {url ? (
           <div>
             <video controls src={url} onClick={() => setUrl(url)}>
