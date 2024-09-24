@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -20,13 +21,14 @@ interface Image {
   headers?: { name: string; value: string }[];
 }
 
-interface Video {
-  // Define the structure of your Video type here
-}
-
 @Controller('api')
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  @Get('hello')
+  async getHello() {
+    return 'Hello World!';
+  }
 
   @Post('imgs')
   async getImgUrl(
