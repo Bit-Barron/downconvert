@@ -37,7 +37,7 @@
 
 <h2>Kontakt und Unterstützung</h2>
 <p>Wenn Sie Fragen oder Unterstützung benötigen, kontaktieren Sie uns bitte über die folgende E-Mail-Adresse: <a href="mailto:support@downconvert.com">support@downconvert.com</a>.</p>
-![image_alt](https://github.com/Bit-Barron/downconvert/blob/38a492ca76f25f2a8e21dab6256ce0e32c185089/Screenshot_20240925_213020.png)
+    <img src="https://github.com/Bit-Barron/downconvert/blob/38a492ca76f25f2a8e21dab6256ce0e32c185089/Screenshot_20240925_213020.png" alt="Support Bildschirmfoto" />
 <footer>
     &copy; 2024 DownConvert. Alle Rechte vorbehalten.
 </footer>
