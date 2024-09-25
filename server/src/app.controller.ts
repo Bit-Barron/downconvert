@@ -14,6 +14,8 @@ import JSZip from 'jszip';
 import path from 'path';
 import sharp, { FormatEnum } from 'sharp';
 import { AppService } from './app.service';
+import gifEncoder from 'gif-encoder';
+import { createCanvas, loadImage } from 'canvas';
 
 interface Image {
   url: string;
@@ -26,7 +28,7 @@ interface Video {
 
 @Controller('api')
 export class AppController {
-  constructor(private readonly appService: AppService) {}z
+  constructor(private readonly appService: AppService) {}
 
   @Post('imgs')
   async getImgUrl(
@@ -63,6 +65,9 @@ export class AppController {
         if (format === 'original') {
           // Don't convert, use original image data
           zip.file(name, imageBuffer);
+        } else if (format === 'gif') {
+          const gifBuffer = await this.convertToGif(imageBuffer);
+          zip.file(`${name}.gif`, gifBuffer);
         } else {
           let sharpInstance = sharp(imageBuffer);
 
@@ -109,8 +114,26 @@ export class AppController {
       'avif',
       'heif',
       'tiff',
+      'gif',
     ];
     return validFormats.includes(format.toLowerCase());
+  }
+
+  private async convertToGif(imageBuffer: Buffer): Promise<Buffer> {
+    const image = await loadImage(imageBuffer);
+    const canvas = createCanvas(image.width, image.height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+
+    const gif = new gifEncoder(image.width, image.height);
+    const gifBuffer = [];
+
+    gif.on('data', (data) => gifBuffer.push(data));
+    gif.writeHeader();
+    gif.addFrame(ctx.getImageData(0, 0, image.width, image.height).data);
+    gif.finish();
+
+    return Buffer.concat(gifBuffer);
   }
 
   @Post('videos')

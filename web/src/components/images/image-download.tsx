@@ -18,7 +18,6 @@ export const ImageDownload: React.FC = () => {
 
   const sendImages = async (images: Image[]): Promise<void> => {
     try {
-      console.log("Sending request with format:", format);
       const response = await axios.post(
         `https://downconvert-server.barron.agency/api/imgs`,
         {
@@ -29,39 +28,20 @@ export const ImageDownload: React.FC = () => {
           responseType: "blob",
         }
       );
+      const contentdisposition =
+        response.headers["content-disposition"].split("=")[1];
+      const blob = new Blob([response.data], { type: "application/zip" });
 
-      console.log("Response headers:", response.headers);
-      console.log("Response type:", response.data.type);
-
-      const contentDisposition = response.headers["content-disposition"];
-      let filename = contentDisposition
-        ? contentDisposition.split("filename=")[1].replace(/"/g, "")
-        : "download";
-
-      const blob = new Blob([response.data], { type: response.data.type });
-
-      // Handle different content types
-      if (response.data.type === "application/zip") {
-        filename = filename || "images.zip";
-      } else {
-        // For single file downloads (e.g., when format is 'original' and only one image)
-        const extension =
-          format === "original" ? images[0].url.split(".").pop() : format;
-        filename = `${filename || "image"}.${extension}`;
+      if (downloadLinkRef.current) {
+        downloadLinkRef.current.href = URL.createObjectURL(blob);
+        downloadLinkRef.current.download = contentdisposition;
+        downloadLinkRef.current.click();
+        URL.revokeObjectURL(downloadLinkRef.current.href);
       }
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
 
       toast.success("Images downloaded successfully");
     } catch (err) {
-      console.error("Error downloading images:", err);
+      console.error(err);
       toast.error("Error downloading images");
     }
   };
@@ -83,11 +63,8 @@ export const ImageDownload: React.FC = () => {
               <SelectValue placeholder="Select format" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem key="original" value="original">
-                original
-              </SelectItem>
-              {IMAGE_FORMATS.map((fmt, index) => (
-                <SelectItem key={`${fmt}-${index}`} value={fmt}>
+              {IMAGE_FORMATS.map((fmt) => (
+                <SelectItem defaultValue={fmt[0]} key={fmt} value={fmt}>
                   {fmt.toUpperCase()}
                 </SelectItem>
               ))}

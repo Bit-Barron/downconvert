@@ -26,7 +26,9 @@ export const Images: React.FC = () => {
 
       chrome.storage.local.get(tabId.toString(), (items) => {
         const requests = (items[tabId.toString()] as ImageDetails[]) || [];
-        const imgs = requests.filter(({ type }) => type === "image" || type === "media");
+        const imgs = requests.filter(
+          ({ type }) => type === "image" || type === "media"
+        );
 
         const uniqueImages = [
           ...new Map(imgs.map((item) => [item.url, item])).values(),
@@ -35,11 +37,12 @@ export const Images: React.FC = () => {
         const imagePromises = uniqueImages.map(({ url }) => {
           return new Promise<ImageData>((resolve) => {
             const img = new Image();
-            img.onload = () => resolve({ 
-              url: img.src, 
-              height: img.height, 
-              isGif: url.toLowerCase().endsWith('.gif') 
-            });
+            img.onload = () =>
+              resolve({
+                url: img.src,
+                height: img.height,
+                isGif: url.toLowerCase().endsWith(".gif"),
+              });
             img.onerror = () => resolve({ url, height: 0, isGif: false });
             img.src = url;
           });
@@ -95,7 +98,10 @@ export const Images: React.FC = () => {
     <div className="relative min-h-screen pb-16">
       <Toaster richColors position="top-center" />
       {images.length === 0 ? (
-        <div className="text-xl font-bold">No images found</div>
+        <>
+          <div className="text-xl font-bold">No images found</div>
+          <p>Try to reload the page</p>
+        </>
       ) : (
         <div>
           <ImageMasonry />

@@ -3,8 +3,8 @@ export const IMAGE_FORMATS = [
   "jpeg",
   "png",
   "webp",
-  "avif",
   "tiff",
+  "gif",
 ] as const;
 
 export type ImageFormat = (typeof IMAGE_FORMATS)[number] | "original";
@@ -15,7 +15,6 @@ export const VIDEO_FORMATS = [
   "asf",
   "mp4",
   "mov",
-  "gif",
   "webm",
 ] as const;
 
