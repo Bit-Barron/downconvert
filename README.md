@@ -39,6 +39,7 @@
 <p>Wenn Sie Fragen oder Unterstützung benötigen, kontaktieren Sie uns bitte über die folgende E-Mail-Adresse: <a href="mailto:support@downconvert.com">support@downconvert.com</a>.</p>
 <p align="center">
     <img width="400" src="https://github.com/Bit-Barron/downconvert/blob/38a492ca76f25f2a8e21dab6256ce0e32c185089/Screenshot_20240925_213020.png" alt="Support Bildschirmfoto" class="footer-image" />
+    <img width="400" src="https://github.com/Bit-Barron/downconvert/blob/25d7550ca048c7c3ecab2aca9f058da6757b1a91/Screenshot_20240925_214104.png" />
 </p>
 
 
