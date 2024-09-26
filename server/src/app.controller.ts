@@ -36,7 +36,6 @@ export class AppController {
   ) {
     try {
       const { images, format } = payload;
-      console.log(images, format);
 
       if (format !== 'original' && !this.isValidFormat(format)) {
         throw new HttpException(
