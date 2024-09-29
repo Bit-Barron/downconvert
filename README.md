@@ -30,6 +30,7 @@
 
 <h2>Unterstützte Formate</h2>
 <p>DownConvert unterstützt eine Vielzahl von Bild- und Videoformaten, darunter:</p>
+
 <ul>
     <li><strong>Bilder:</strong> JPEG, PNG, GIF, BMP, TIFF</li>
     <li><strong>Videos:</strong> MP4, AVI, MKV, WEBM, MOV</li>
